@@ -5,43 +5,31 @@ LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UM
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/city.csv" AS line3 FIELDTERMINATOR ';'
 
---
-
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/country.csv" AS line4 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/address.csv" AS line1 FIELDTERMINATOR ';'
-
---
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/category.csv" AS line2 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/store.csv" AS line15 FIELDTERMINATOR ';'
 
---
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/customer.csv" AS line5 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/language.csv" AS line11 FIELDTERMINATOR ';'
 
---
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/film.csv" AS line9 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/film_actor.csv" AS line6 FIELDTERMINATOR ';'
 
---
-
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/film_category.csv" AS line7 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/film_text.csv" AS line8 FIELDTERMINATOR ';'
 
---
-
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/inventory.csv" AS line10 FIELDTERMINATOR ';'
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/staff.csv" AS line14 FIELDTERMINATOR ';'
-
---
 
 LOAD CSV WITH HEADERS FROM "file:///Users/saraalexandradasilvapereira/Desktop/UMinho/BDnoSQL/NoSQL_vs_SQL/Neo4j/actor/rental.csv" AS line13 FIELDTERMINATOR ';'
 
