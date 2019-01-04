@@ -12,19 +12,19 @@ CUSTOMER_COLLECTION:
   district
   postal_code
 
-  rentals_made [
+  rentals_made [{
     rental_id
     film_id
     film_title
     rental_date
     return_date
     staff_id
-    payments [
+    payment_info [{
       payment_id
       payment_date
       amount
-    ]
-  ]
+    }]
+  }]
 
 
 
@@ -45,7 +45,7 @@ STORE_COLLECTION:
   manager_last_name
   manager_phone
   
-  staff [
+  staff [{
     store_id
     staff_id
     first_name
@@ -55,14 +55,15 @@ STORE_COLLECTION:
     country
     district
     staff_phone
-  ]
+  }]
 
-  inventory [
+  inventory [{
     store_id
     inventory_id
     film_id
     film_title
-  ]
+    film_category
+  }]
 
 
 
@@ -70,9 +71,9 @@ STORE_COLLECTION:
 
 FILMS_COLLECTION:
   film_id
-  film_title
+  title
   description
-  - category
+  category
   release_year
   language
   length
@@ -81,11 +82,11 @@ FILMS_COLLECTION:
   rental_rate
   replacement_cost
   special_features
-  cast [
+  cast [{
     actor_id
     actor_first_name
     actor_last_name
-  ] 
+  }]
 
 
 

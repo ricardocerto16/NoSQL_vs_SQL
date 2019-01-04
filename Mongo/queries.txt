@@ -1,0 +1,85 @@
+
+
+# nomes filmes e pagamento do alugar do cliente "MARIA MILLER"
+db.customersCollection.find(
+    {
+        first_name: "MARIA", last_name: "MILLER"
+    },
+    {
+        _id: 0, first_name: 1, last_name: 1, "rentals_made.film_title": 1, "rentals_made.rental_date": 1, "rentals_made.return_date": 1, "rentals_made.payment_info.payment_amount": 1
+     }
+).pretty()
+
+
+
+
+
+
+# total de dinheiro gasto pela cliente "MARIA MILLER"
+
+db.customersCollection.find({
+        first_name: "MARIA", last_name: "MILLER"
+     }
+    ).sort(
+        {
+            "rentals_made.payment_info.payment_amounts": -1
+        }
+).limit(1)
+
+
+db.customersCollection.aggregate([
+    {
+        $match: {first_name: "MARIA", last_name: "MILLER"}
+    },
+    {
+        $project: {
+            first_name: 1,
+            last_name: 1,
+            total: { $sum: "$rentals_made.payment_info.payment_amount"}
+        }
+    }
+])
+
+
+
+# listar os filmes com "Deleted Scenes" nas special features
+db.filmsCollection.find(
+    {
+        special_features: {$in:[/Deleted Scenes/]}
+        },
+    {
+        _id: 0, title: 1, category: 1, release_year: 1, rating: 1, special_features: 1
+    }
+).pretty()
+
+
+# listar os filmes da categoria "Action" presentes na loja 1.
+
+db.storesCollection.createIndex({"inventory.film_category": "text"})
+db.storesCollection.find( { $text: { $search: "Action" } } )
+
+
+
+db.storesCollection.find(
+    {
+        _id: 1, "inventory.film_category": "Action"
+    },
+    {
+        _id: 0, address: 1, phone: 1, city: 1, country: 1, district: 1, "inventory.film_title": 1, "inventory.film_category": 1
+    }
+).pretty()
+
+
+
+
+
+# elenco do filme "ALIEN CENTER"
+
+db.filmsCollection.find(
+    {
+        title: "ALIEN CENTER"
+    },
+    {
+        _id: 0, title: 1, description: 1, category: 1, release_year: 1, "cast.actor_first_name": 1, "cast.actor_last_name": 1
+    }
+).pretty()

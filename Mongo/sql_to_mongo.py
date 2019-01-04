@@ -18,7 +18,7 @@ def connectToSQL():
             return
 
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Erro na Base de Dados")
+            print("Erro na Base de Dados\n")
             return
         else:
             print(err)
@@ -30,7 +30,7 @@ def connectToMongo():
     mongodb = client["sakila_mongo"]
 
     if "sakila_mongo" in client.list_database_names():
-        print("Base de Dados Mongo já existia")
+        print("Base de Dados Mongo já existia\n")
         # SE JÁ EXISTIA A BD AO EXECUTAR O SCRIPT, FAZ DROP DELA
         client.drop_database("sakila_mongo")
     return mongodb
@@ -40,21 +40,21 @@ def insertFilmsMongoDB(mysqld, mongodb):
     cursor = mysqld.cursor()
     filmsMongoDoc = getFilms(cursor)
     filmInsertResult = mongodb.filmsCollection.insert_many(filmsMongoDoc)
-    print(filmInsertResult.inserted_ids)
+    print("     Id's inseridos: ", filmInsertResult.inserted_ids, "\n")
 
 
 def insertCustomersMongoDB(mysqld, mongodb):
     cursor = mysqld.cursor()
     customersMongoDoc = getCustomers(cursor)
     customerInsertResult = mongodb.customersCollection.insert_many(customersMongoDoc)
-    print(customerInsertResult.inserted_ids)
+    print("     Id's inseridos: ", customerInsertResult.inserted_ids, "\n")
 
 
 def insertStoresMongoDB(mysqld, mongodb):
     cursor = mysqld.cursor()
     storesMongoDoc = getStores(cursor)
     storeInsertResult = mongodb.storesCollection.insert_many(storesMongoDoc)
-    print(storeInsertResult.inserted_ids)
+    print("     Id's inseridos: ", storeInsertResult.inserted_ids)
 
 
 
@@ -64,7 +64,7 @@ def getFilms(cursor):
                  "INNER JOIN language as l ON f.language_id = l.language_id " \
                  "INNER JOIN film_category ON f.film_id = film_category.film_id " \
                  "INNER JOIN category AS c ON film_category.category_id = c.category_id " \
-                 "ORDER BY f.film_id LIMIT 20"
+                 "ORDER BY f.film_id "
 
     cursor.execute(filmsQuery)
     filmsRes = cursor.fetchall()
@@ -84,7 +84,7 @@ def getFilms(cursor):
         rentalDuration = film[8]
         rentalRate = film[9]
         replacementCost = film[10]
-        specialFeatures = str(film[11])[1:-1].replace("\'", "").split(",")  # {'Deleted Scenes', 'Behind the Scenes'} -> "['Deleted Scenes', 'Behind the Scenes']"
+        specialFeatures = str(film[11])[1:-1].replace("\'", "").split(",")
         castDoc = getFilmCast(cursor, filmID)
 
         filmDoc = {"_id": filmID,
@@ -104,7 +104,6 @@ def getFilms(cursor):
         numberFilms += 1
         filmsDocList.append(filmDoc)
 
-    # [{'film_id': 1, 'title': 'ACADEMY DINOSAUR', 'description': 'A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies', 'category': 'Documentary', 'release_year': 2006, 'language': 'English', 'length': 86, 'rating': 'PG', 'rental_duration': 6, 'rental_rate': Decimal('0.99'), 'replacement_cost': Decimal('20.99'), 'special_features': {'Behind the Scenes', 'Deleted Scenes'}, 'cast': [{'actor_id': 1, 'actor_first_name': 'PENELOPE', 'actor_last_name': 'GUINESS'},
     print("Número de films existentes na coleção: " + str(numberFilms))
     return filmsDocList
 
@@ -131,7 +130,6 @@ def getFilmCast(cursor, filmID):
                     "actor_last_name": actorLastName}
 
         castDocList.append(actorDoc)
-    # [{'actor_id': 1, 'actor_first_name': 'PENELOPE', 'actor_last_name': 'GUINESS'}, {'actor_id': 10, 'actor_first_name': 'CHRISTIAN', 'actor_last_name': 'GABLE'},
     return castDocList
 
 
@@ -141,7 +139,7 @@ def getCustomers(cursor):
                      "INNER JOIN address AS a ON cs.address_id = a.address_id " \
                      "INNER JOIN city AS ct ON a.city_id = ct.city_id " \
                      "INNER JOIN country AS cnt ON ct.country_id = cnt.country_id " \
-                     "ORDER BY cs.store_id LIMIT 1"
+                     "ORDER BY cs.customer_id"
 
     cursor.execute(customersQuery)
     customersRes = cursor.fetchall()
@@ -177,17 +175,15 @@ def getCustomers(cursor):
         numberClients += 1
         customersDocList.append(customerDoc)
 
-    # [{'customer_id': 247, 'first_name': 'STELLA', 'last_name': 'MORENO', 'email': 'STELLA.MORENO@sakilacustomer.org', 'address': '1473 Changhwa Parkway', 'phone': '266798132374', 'city': 'Coacalco de Berriozbal', 'country': 'Mexico', 'district': 'Mxico', 'postal_code': '75933', 'rentals_made': [{'rental_id': 189, 'inventory_id': 984, 'customer_id': 247, 'store_id': 1, 'film_title': 'DEEP CRUSADE', 'rental_date': datetime.datetime(2005, 5, 26, 6, 1, 41), 'return_date': datetime.datetime(2005, 5, 27, 6, 11, 41), 'staff_id': 1, 'payment_info': [{'payment_id': 6677, 'customer_id': 247, 'payment_date': datetime.datetime(2005, 5, 26, 6, 1, 41), 'payment_amount': Decimal('4.99')}]},
     print("Número de customers existentes na coleção: " + str(numberClients))
     return customersDocList
 
 
 def getCustomerRentals(cursor, customerID):
-    rentalsQuery = "SELECT r.rental_id, r.inventory_id, r.customer_id, s.store_id, f.title, r.rental_date, r.return_date, r.staff_id " \
+    rentalsQuery = "SELECT r.rental_id, f.title, r.rental_date, r.return_date " \
                        "FROM rental AS r " \
                        "INNER JOIN inventory AS i ON r.inventory_id = i.inventory_id " \
                        "INNER JOIN film AS f ON i.film_id = f.film_id " \
-                       "INNER JOIN store AS s ON i.store_id = s.store_id " \
                        "WHERE r.customer_id = " + str(customerID)
 
     cursor.execute(rentalsQuery)
@@ -197,33 +193,24 @@ def getCustomerRentals(cursor, customerID):
 
     for rental in rentalsRes:
         rentalID = rental[0]
-        inventoryID = rental[1]
-        # customerID = customerID
-        storeID = rental[3]
-        filmTitle = rental[4]
-        rentalDate = rental[5]
-        returnDate = rental[6]
-        staffID = rental[7]
+        filmTitle = rental[1]
+        rentalDate = rental[2]
+        returnDate = rental[3]
         paymentsDoc = getRentalsPayment(cursor, rentalID)
 
         rentalDoc = {"_id": rentalID,
-                     "inventory_id": inventoryID,
-                     "customer_id": customerID,
-                     "store_id": storeID,
                      "film_title": filmTitle,
                      "rental_date": rentalDate,
                      "return_date": returnDate,
-                     "staff_id": staffID,
                      "payment_info": paymentsDoc}
 
         rentalsDocList.append(rentalDoc)
 
-    # [{'rental_id': 189, 'inventory_id': 984, 'customer_id': 247, 'store_id': 1, 'film_title': 'DEEP CRUSADE', 'rental_date': datetime.datetime(2005, 5, 26, 6, 1, 41), 'return_date': datetime.datetime(2005, 5, 27, 6, 11, 41), 'staff_id': 1, 'payment_info': [{'payment_id': 6677, 'customer_id': 247, 'payment_date': datetime.datetime(2005, 5, 26, 6, 1, 41), 'payment_amount': Decimal('4.99')}]},
     return rentalsDocList
 
 
 def getRentalsPayment(cursor, rentalID):
-    paymentsQuery = "SELECT p.payment_id, p.customer_id, p.payment_date, p.amount " \
+    paymentsQuery = "SELECT p.payment_id, p.payment_date, p.amount " \
                      "FROM payment AS p " \
                      "WHERE p.rental_id = " + str(rentalID)
 
@@ -234,29 +221,26 @@ def getRentalsPayment(cursor, rentalID):
 
     for payment in paymentsRes:
         paymentID = payment[0]
-        customerID = payment[1]
-        paymentDate = payment[2]
-        paymentAmount = payment[3]
+        paymentDate = payment[1]
+        paymentAmount = payment[2]
 
         paymentDoc = {"_id": paymentID,
-                      "customer_id": customerID,
                       "payment_date": paymentDate,
                       "payment_amount": Decimal128(paymentAmount)}
 
         paymentsDocList.append(paymentDoc)
 
-    # [{'payment_id': 8380, 'customer_id': 308, 'payment_date': datetime.datetime(2005, 8, 23, 15, 3, 13), 'payment_amount': Decimal('2.99')}]
     return paymentsDocList
 
 
 def getStores(cursor):
-    storesQuery = "SELECT s.store_id, a.address, a.phone, a.postal_code, ct.city, cnt.country, a.district, s.manager_staff_id, stf.first_name AS manager_first_name, stf.last_name AS manager_last_name, (SELECT a.phone FROM address AS a WHERE a.address_id = stf.address_id) AS manager_phone " \
+    storesQuery = "SELECT s.store_id, a.address, a.phone, a.postal_code, ct.city, cnt.country, a.district, stf.first_name AS manager_first_name, stf.last_name AS manager_last_name, (SELECT a.phone FROM address AS a WHERE a.address_id = stf.address_id) AS manager_phone " \
                   "FROM store as s " \
                   "INNER JOIN address AS a ON s.address_id = a.address_id " \
                   "INNER JOIN city AS ct ON a.city_id = ct.city_id " \
                   "INNER JOIN country AS cnt ON ct.country_id = cnt.country_id " \
                   "INNER JOIN staff AS stf ON s.manager_staff_id = stf.staff_id " \
-                  "ORDER BY s.store_id LIMIT 1;"
+                  "ORDER BY s.store_id;"
 
     cursor.execute(storesQuery)
     storesRes = cursor.fetchall()
@@ -272,10 +256,9 @@ def getStores(cursor):
         storeCity = store[4]
         storeCountry = store[5]
         storeDistrict = store[6]
-        managerId = store[7]
-        managerFirstName = store[8]
-        managerLastName = store[9]
-        managerPhone = store[10]
+        managerFirstName = store[7]
+        managerLastName = store[8]
+        managerPhone = store[9]
 
         staffDoc = getStaff(cursor, storeID)
         inventoryDoc = getInventory(cursor, storeID)
@@ -287,7 +270,6 @@ def getStores(cursor):
                     "city": storeCity,
                     "country": storeCountry,
                     "district": storeDistrict,
-                    "manager_id": managerId,
                     "manager_first_name": managerFirstName,
                     "manager_last_name": managerLastName,
                     "manager_phone": managerPhone,
@@ -296,9 +278,10 @@ def getStores(cursor):
 
         numberStores += 1
         storesDocList.append(storeDoc)
-        # [{'store_id': 1, 'address': '47 MySakila Drive', 'phone': '', 'postal_code': '', 'city': 'Lethbridge', 'country': 'Canada', 'district': 'Alberta', 'manager_id': 1, 'manager_first_name': 'Mike', 'manager_last_name': 'Hillyer', 'staff': [{'staff_id': 1, 'first_name': 'Mike', 'last_name': 'Hillyer', 'address': '23 Workhaven Lane', 'email': 'Mike.Hillyer@sakilastaff.com', 'city': 'Lethbridge', 'country': 'Canada', 'district': 'Alberta', 'phone': '14033335568'}], 'inventory': [{'inventory_id': 1, 'film_id': 1, 'film_title': 'ACADEMY DINOSAUR'},
-        print("Número de stores existentes na coleção: " + str(numberStores))
-        return storesDocList
+
+    print("Número de stores existentes na coleção: " + str(numberStores))
+
+    return storesDocList
 
 
 def getStaff(cursor, storeID):
@@ -336,14 +319,16 @@ def getStaff(cursor, storeID):
                     "phone": staffPhone}
 
         staffDocList.append(staffDoc)
-    # [{'staff_id': 1, 'first_name': 'Mike', 'last_name': 'Hillyer', 'address': '23 Workhaven Lane', 'email': 'Mike.Hillyer@sakilastaff.com', 'city': 'Lethbridge', 'country': 'Canada', 'district': 'Alberta', 'phone': '14033335568'}]
+
     return staffDocList
 
 
 def getInventory(cursor, storeID):
-    inventoryQuery = "SELECT i.inventory_id, i.film_id, f.title " \
+    inventoryQuery = "SELECT i.inventory_id, f.title, c.name " \
                      "FROM inventory AS i " \
                      "INNER JOIN film as f ON i.film_id = f.film_id " \
+                     "INNER JOIN film_category ON f.film_id = film_category.film_id " \
+                     "INNER JOIN category AS c ON film_category.category_id = c.category_id " \
                      "WHERE i.store_id = " + str(storeID)
 
     cursor.execute(inventoryQuery)
@@ -353,16 +338,15 @@ def getInventory(cursor, storeID):
 
     for product in inventoryRes:
         inventoryID = product[0]
-        filmID = product[1]
-        filmTitle = product[2]
+        filmTitle = product[1]
+        filmCategory = product[2]
 
         inventoryDoc = {"_id": inventoryID,
-                        "film_id": filmID,
-                        "film_title": filmTitle}
+                        "film_title": filmTitle,
+                        "film_category": filmCategory}
 
         inventoryDocList.append(inventoryDoc)
 
-    # [{'inventory_id': 1, 'film_id': 1, 'film_title': 'ACADEMY DINOSAUR'}, {'inventory_id': 2, 'film_id': 1, 'film_title': 'ACADEMY DINOSAUR'},
     return inventoryDocList
 
 # ================================================================================================================================================= #
@@ -374,8 +358,6 @@ def main():
 
     # CONECTAR BASE DE DADOS MONGO
     mongodb = connectToMongo()
-
-    # TODO TIRAR O LIMIT E VER SE É PRECISO TIRAR OS ID'S
 
     # ADICIONAR FILMS À COLEÇÃO EM MONGO
     insertFilmsMongoDB(mysqld, mongodb)
