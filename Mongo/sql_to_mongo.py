@@ -30,7 +30,7 @@ def connectToMongo():
     mongodb = client["sakila_mongo"]
 
     if "sakila_mongo" in client.list_database_names():
-        print("Base de Dados Mongo já existia\n")
+        print("Base de Dados Mongo já existia, dropped para nova criação\n")
         # SE JÁ EXISTIA A BD AO EXECUTAR O SCRIPT, FAZ DROP DELA
         client.drop_database("sakila_mongo")
     return mongodb
@@ -324,7 +324,7 @@ def getStaff(cursor, storeID):
 
 
 def getInventory(cursor, storeID):
-    inventoryQuery = "SELECT i.inventory_id, f.title, c.name " \
+    inventoryQuery = "SELECT i.inventory_id, f.title, c.name, f.replacement_cost " \
                      "FROM inventory AS i " \
                      "INNER JOIN film as f ON i.film_id = f.film_id " \
                      "INNER JOIN film_category ON f.film_id = film_category.film_id " \
@@ -340,10 +340,12 @@ def getInventory(cursor, storeID):
         inventoryID = product[0]
         filmTitle = product[1]
         filmCategory = product[2]
+        filmReplacementCost = product[3]
 
         inventoryDoc = {"_id": inventoryID,
                         "film_title": filmTitle,
-                        "film_category": filmCategory}
+                        "film_category": filmCategory,
+                        "film_replacement_cost": Decimal128(filmReplacementCost)}
 
         inventoryDocList.append(inventoryDoc)
 
